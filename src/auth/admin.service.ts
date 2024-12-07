@@ -1,19 +1,25 @@
-import { Injectable, ConflictException, InternalServerErrorException } from '@nestjs/common'; 
+import {
+  Injectable,
+  ConflictException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 // ConflictException表示数据冲突（如用户名已存在），InternalServerErrorException表示服务端错误
-import { InjectModel } from '@nestjs/mongoose'; 
+import { InjectModel } from '@nestjs/mongoose';
 // InjectModel用于将Mongoose模型注入到服务中
-import { Admin, AdminDocument } from './schemas/admin.schema'; 
+import { Admin, AdminDocument } from './schemas/admin.schema';
 // Admin类和AdminDocument类型，用于定义管理员数据结构和文档类型
-import { Model } from 'mongoose'; 
+import { Model } from 'mongoose';
 // Model是Mongoose的模型类型，用于对数据库集合进行CRUD操作
-import { CreateAdminDto } from './dto/create-admin.dto'; 
+import { CreateAdminDto } from './dto/create-admin.dto';
 // DTO用于验证和约束请求数据格式
-import * as bcrypt from 'bcrypt'; 
+import * as bcrypt from 'bcrypt';
 // bcrypt用于对密码进行哈希
 
 @Injectable()
 export class AdminService {
-  constructor(@InjectModel(Admin.name) private adminModel: Model<AdminDocument>) {}
+  constructor(
+    @InjectModel(Admin.name) private adminModel: Model<AdminDocument>,
+  ) {}
   // 通过@InjectModel注入Admin对应的Mongoose模型，以进行数据库操作
 
   async create(createAdminDto: CreateAdminDto): Promise<Admin> {
@@ -38,8 +44,7 @@ export class AdminService {
   }
 
   async findOne(username: string): Promise<Admin | undefined> {
-    // 根据用户名查找管理员
-    return this.adminModel.findOne({ username }).exec();
+    return await this.adminModel.findOne({ username }).exec();
     // 使用Mongoose的findOne查询，如果找到则返回AdminDocument实例，如果没找到则返回null
   }
 }

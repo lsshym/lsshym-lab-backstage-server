@@ -24,10 +24,9 @@ async function bootstrap() {
   if (existingAdmin) {
     console.log(`管理员用户 "${username}" 已存在，跳过创建。`);
   } else {
-    const hashedPassword = await bcrypt.hash(plainPassword, 10);
     await adminService.create({
       username,
-      password: hashedPassword,
+      password: plainPassword,
     });
     console.log(`管理员用户 "${username}" 创建成功。`);
   }

@@ -19,7 +19,6 @@ async function bootstrap() {
     .setTitle('API 文档') // API 文档的标题
     .setDescription('NestJS API 文档说明') // API 文档的描述
     .setVersion('1.0') // API 的版本
-    .addTag('cats') // 可选，定义API的tag，用于分类
     .build();
 
   // 创建 Swagger 文档

@@ -1,21 +1,31 @@
-import { Controller, Post, Body, UseGuards, Request, Get } from '@nestjs/common'; 
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  Get,
+  UnauthorizedException,
+} from '@nestjs/common';
 // 导入Controller、Post、Body、UseGuards、Request、Get等装饰器和方法，用于定义控制器路由和请求处理
 import { AdminService } from './admin.service'; // 管理员数据服务，用于注册管理员
 import { AuthService } from './auth.service'; // 认证服务，用于登录等操作
-import { CreateAdminDto } from './dto/create-admin.dto'; 
 // 用于管理员注册的DTO对象定义，验证输入数据格式
-import { LocalAuthGuard } from './local-auth.guard'; 
+import { LocalAuthGuard } from './local-auth.guard';
 // 本地认证守卫，在请求前验证用户名密码
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard'; 
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { LoginAdminDto } from './dto/login-admin.dto';
+import * as bcrypt from 'bcrypt';
 // JWT认证守卫，在请求前验证JWT令牌有效性
 
-@Controller('auth') 
+@Controller('auth')
 // 将此控制器下的路由均以/auth作为前缀，例如/auth/register、/auth/login、/auth/profile
 export class AuthController {
   constructor(
     private readonly adminService: AdminService,
     // 注入AdminService，用于创建管理员用户
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
     // 注入AuthService，用于登录和JWT生成逻辑
   ) {}
 
@@ -29,14 +39,30 @@ export class AuthController {
   //   // 返回JSON响应，包括成功消息和新创建管理员的ID
   // }
 
-  @UseGuards(LocalAuthGuard)
   // 使用本地认证守卫，在进入下个路由处理器前先验证用户名密码
   @Post('login')
   // 定义POST /auth/login路由，用于管理员登录
-  async login(@Request() req) {
-    // @Request() 获取请求对象，LocalAuthGuard验证通过后会将管理员信息挂载在req.user上
-    return this.authService.login(req.user);
-    // 调用authService的login方法，根据管理员信息生成JWT令牌并返回
+  @ApiOperation({ summary: '用户登录' }) // 描述接口操作
+  @ApiBody({ type: LoginAdminDto }) // 指定请求体类型
+  @ApiResponse({ status: 200, description: '登录成功' }) // 描述返回结果
+  @ApiResponse({ status: 401, description: '认证失败' })
+  async login(@Body() loginAdminDto: LoginAdminDto) {
+    // 通过用户名查找管理员（假设存在 adminService.findOne 方法）
+    const admin = await this.adminService.findOne(loginAdminDto.username);
+
+    if (!admin) {
+      throw new UnauthorizedException('管理员不存在');
+    }
+    // 验证密码（假设使用 bcrypt 比较密码）
+    const isPasswordValid = await bcrypt.compare(
+      loginAdminDto.password,
+      admin.password,
+    );
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('密码错误');
+    }
+
+    return this.authService.login(admin); // 传递 admin 实体到 login 方法
   }
 
   @UseGuards(JwtAuthGuard)
