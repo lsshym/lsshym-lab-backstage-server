@@ -9,6 +9,9 @@ export type AdminDocument = Admin & Document;
 @Schema() 
 // @Schema标记此类为Mongoose的Schema
 export class Admin {
+  toObject(): { [x: string]: any; password: any; } {
+    throw new Error('Method not implemented.');
+  }
   @Prop({ unique: true, required: true })
   // @Prop定义字段，unique:true表示该字段值必须唯一，required:true表示必填
   username: string;

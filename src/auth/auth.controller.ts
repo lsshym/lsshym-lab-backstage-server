@@ -19,15 +19,15 @@ export class AuthController {
     // 注入AuthService，用于登录和JWT生成逻辑
   ) {}
 
-  @Post('register')
-  // 定义POST /auth/register路由，用于管理员注册
-  async register(@Body() createAdminDto: CreateAdminDto) {
-    // @Body() 装饰器从请求体中解析JSON数据并映射到CreateAdminDto
-    const admin = await this.adminService.create(createAdminDto);
-    // 调用adminService的create方法创建新管理员（哈希密码后存储）
-    return { message: '管理员注册成功', adminId: admin._id };
-    // 返回JSON响应，包括成功消息和新创建管理员的ID
-  }
+  // @Post('register')
+  // // 定义POST /auth/register路由，用于管理员注册
+  // async register(@Body() createAdminDto: CreateAdminDto) {
+  //   // @Body() 装饰器从请求体中解析JSON数据并映射到CreateAdminDto
+  //   const admin = await this.adminService.create(createAdminDto);
+  //   // 调用adminService的create方法创建新管理员（哈希密码后存储）
+  //   return { message: '管理员注册成功', adminId: admin._id };
+  //   // 返回JSON响应，包括成功消息和新创建管理员的ID
+  // }
 
   @UseGuards(LocalAuthGuard)
   // 使用本地认证守卫，在进入下个路由处理器前先验证用户名密码
