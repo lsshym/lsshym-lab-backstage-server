@@ -91,13 +91,11 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('checkAuthStatus')
+  @Get('me')
   @ApiOperation({ summary: '检查当前用户的认证状态' })
   @ApiResponse({ status: 200, description: '已认证用户信息' })
   @ApiResponse({ status: 401, description: '未认证' })
   checkAuth(@Request() req) {
-    // 如果通过 JwtAuthGuard，那么 req.user 就是已认证用户信息
-    console.log(req)
     return {
       isAuthenticated: true,
     };
