@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser'; // 引入cookie-parser中间件，用于解析请求中的Cookie
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,6 +15,12 @@ async function bootstrap() {
     transform: true, 
     // 自动将请求中的字符串等数据转化为DTO定义的类型（如string转number）
   }));
+  app.use(cookieParser());
+  app.enableCors({
+    origin: 'http://localhost:8080',
+    credentials: true,
+  });
+  
   // Swagger 配置
   const config = new DocumentBuilder()
     .setTitle('API 文档') // API 文档的标题
@@ -29,3 +36,4 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
