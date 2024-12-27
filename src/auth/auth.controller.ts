@@ -62,8 +62,9 @@ export class AuthController {
     if (!isPasswordValid) {
       throw new UnauthorizedException('密码错误');
     }
+    const expiresIn = 1 * 24 * 60 * 60 * 1000; // 默认1天
 
-    const { access_token } = await this.authService.login(admin); // 传递 admin 实体到 login 方法
+    const { access_token } = await this.authService.login(admin, expiresIn); // 传递 admin 实体到 login 方法
 
     const cookieObj = {
       httpOnly: true,
@@ -71,8 +72,9 @@ export class AuthController {
       maxAge: undefined,
     };
     if (rememberMe) {
-      cookieObj.maxAge = 1 * 24 * 60 * 60 * 1000; // 1 天
+      cookieObj.maxAge = 1 * 24 * 60 * 60 * 1000;
     }
+
     res.cookie('access_token', access_token, cookieObj);
     return res.status(200).json({
       message: '登录成功',

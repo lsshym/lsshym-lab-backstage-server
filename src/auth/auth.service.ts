@@ -35,11 +35,14 @@ export class AuthService {
     // 验证失败则返回null，后续会触发UnauthorizedException
   }
 
-  async login(admin: Admin) {
+  async login(admin: Admin, expiresIn: number) {
     // 登录函数，根据管理员信息生成JWT令牌
     const payload = { username: admin.username, sub: admin._id };
     // payload是JWT中存放的用户信息，sub通常存放用户ID
-    const access_token = this.jwtService.sign(payload);
+    const access_token = this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn, // 使用传入的过期时间
+    });
 
     return {
       access_token,
